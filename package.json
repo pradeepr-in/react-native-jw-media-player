@@ -33,18 +33,21 @@
   "license": "MIT",
   "homepage": "https://github.com/chaimPaneth/react-native-jw-media-player#readme",
   "peerDependencies": {
-    "react-native": "^0.40.0",
-    "react": "~15.4.0-rc.4"
+    "react": "~15.4.0-rc.4",
+    "react-native": "^0.40.0"
   },
   "devDependencies": {
-    "babel-eslint": "^7.1.1",
+    "babel-eslint": "^10.1.0",
     "babel-preset-react-native-stage-0": "^1.0.1",
-    "eslint": "^3.14.1",
-    "eslint-config-airbnb": "^14.0.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^3.0.2",
-    "eslint-plugin-react": "^6.9.0",
-    "eslint-plugin-react-native": "^2.2.1",
-    "pre-commit": "^1.2.2"
+    "eslint": "^7.10.0",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-react": "^7.21.2",
+    "eslint-plugin-react-native": "^3.10.0",
+    "pre-commit": "^1.2.2",
+    "prop-types": "^15.7.2",
+    "react": "~15.4.0-rc.4",
+    "react-native": "^0.40.0"
   }
 }

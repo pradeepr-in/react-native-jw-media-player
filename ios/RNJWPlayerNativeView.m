@@ -456,7 +456,7 @@
     if(adsArray.count > 0) {
         playListItem.adSchedule = adsArray;
     }
-    
+
     return playListItem;
 }
 

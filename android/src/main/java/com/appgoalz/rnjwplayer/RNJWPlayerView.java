@@ -83,6 +83,7 @@ import com.longtailvideo.jwplayer.fullscreen.FullscreenHandler;
 import com.longtailvideo.jwplayer.media.ads.AdBreak;
 import com.longtailvideo.jwplayer.media.ads.AdSource;
 import com.longtailvideo.jwplayer.media.ads.ImaVMAPAdvertising;
+import com.longtailvideo.jwplayer.media.captions.Caption;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 
 import java.util.ArrayList;
@@ -633,6 +634,21 @@ public class RNJWPlayerView extends RelativeLayout implements
             }
         }
 
+        List<Caption> captionTracks = new ArrayList<>();
+        if (playlistItem.hasKey("captionTracks")) {
+            ReadableArray cts = playlistItem.getArray("captionTracks");
+            for (int i = 0; i < cts.size(); i++) {
+                ReadableMap capTrack = cts.getMap(i);
+                captionTracks.add(
+                        new Caption.Builder()
+                                .file(capTrack.getString("file"))
+                                .label(capTrack.getString("label"))
+                                .isdefault(capTrack.hasKey("isDefault") ? capTrack.getBoolean("isDefault") : false)
+                                .build()
+                );
+            }
+        }
+
         PlaylistItem newPlayListItem = new PlaylistItem.Builder()
                 .file(file)
                 .title(title)
@@ -640,6 +656,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                 .image(image)
                 .mediaId(mediaId)
                 .adSchedule(adSchedule)
+                .tracks(captionTracks)
                 .build();
 
         if (startTime != null) {
