@@ -114,7 +114,6 @@ public class RNJWPlayerView extends RelativeLayout implements
         VideoPlayerEvents.OnFirstFrameListener,
         VideoPlayerEvents.OnSeekListener,
         VideoPlayerEvents.OnSeekedListener,
-
         AdvertisingEvents.OnBeforePlayListener,
         AdvertisingEvents.OnBeforeCompleteListener,
         AdvertisingEvents.OnAdPauseListener,
@@ -241,7 +240,7 @@ public class RNJWPlayerView extends RelativeLayout implements
             // service that we know is running in our own process, we can
             // cast its IBinder to a concrete class and directly access it.
             mIsBound = true;
-            mMediaPlaybackService = ((MediaPlaybackService.MediaPlaybackServiceBinder)service)
+            mMediaPlaybackService = ((MediaPlaybackService.MediaPlaybackServiceBinder) service)
                     .getService();
             mMediaPlaybackService.setupMediaSession(mMediaSessionManager, mNotificationWrapper);
         }
@@ -331,7 +330,7 @@ public class RNJWPlayerView extends RelativeLayout implements
         boolean isOldPlayStoreInstalled = doesPackageExist(GOOGLE_PLAY_STORE_PACKAGE_NAME_OLD);
         boolean isNewPlayStoreInstalled = doesPackageExist(GOOGLE_PLAY_STORE_PACKAGE_NAME_NEW);
 
-        boolean isPlaystoreInstalled = isNewPlayStoreInstalled||isOldPlayStoreInstalled;
+        boolean isPlaystoreInstalled = isNewPlayStoreInstalled || isOldPlayStoreInstalled;
 
         boolean isGoogleApiAvailable = GoogleApiAvailability.getInstance()
                 .isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
@@ -551,7 +550,7 @@ public class RNJWPlayerView extends RelativeLayout implements
 
                 @Override
                 public void onAllowRotationChanged(boolean b) {
-                    Log.e(TAG, "onAllowRotationChanged: "+b );
+                    Log.e(TAG, "onAllowRotationChanged: " + b);
                 }
 
                 @Override
@@ -594,7 +593,7 @@ public class RNJWPlayerView extends RelativeLayout implements
         }
     }
 
-    public PlaylistItem getPlaylistItem (ReadableMap playlistItem) {
+    public PlaylistItem getPlaylistItem(ReadableMap playlistItem) {
         if (playlistItem.hasKey("file")) {
             file = playlistItem.getString("file");
         }
@@ -763,7 +762,7 @@ public class RNJWPlayerView extends RelativeLayout implements
         Context simpleContext = getNonBuggyContext(getReactContext(), getAppContext());
 
         mPlayer = new RNJWPlayer(simpleContext, playerConfig);
-        setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+        setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         mPlayer.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT));
@@ -778,7 +777,7 @@ public class RNJWPlayerView extends RelativeLayout implements
         if (backgroundAudioEnabled) {
             audioManager = (AudioManager) simpleContext.getSystemService(Context.AUDIO_SERVICE);
 
-            NotificationManager notificationManager = (NotificationManager)mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager notificationManager = (NotificationManager) mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationWrapper = new NotificationWrapper(notificationManager);
             mMediaSessionManager = new MediaSessionManager(simpleContext,
                     mPlayer,
@@ -835,7 +834,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     }
 
     void hideCastButton() {
-        if (mMediaRouteButton != null)  mMediaRouteButton.setVisibility(GONE);
+        if (mMediaRouteButton != null) mMediaRouteButton.setVisibility(GONE);
     }
 
     void presentCastDialog() {
@@ -919,7 +918,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     // Audio Focus
 
     public void requestAudioFocus() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (hasAudioFocus) {
                 return;
             }
@@ -937,7 +936,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                         .build();
 
                 int res = audioManager.requestAudioFocus(focusRequest);
-                synchronized(focusLock) {
+                synchronized (focusLock) {
                     if (res == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
                         playbackNowAuthorized = false;
                     } else if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -950,8 +949,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                 }
                 Log.e(TAG, "audioRequest: " + res);
             }
-        }
-        else {
+        } else {
             int result = 0;
             if (audioManager != null) {
                 if (hasAudioFocus) {
@@ -1003,7 +1001,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                 switch (focusChange) {
                     case AudioManager.AUDIOFOCUS_GAIN:
                         if (playbackDelayed || !userPaused) {
-                            synchronized(focusLock) {
+                            synchronized (focusLock) {
                                 playbackDelayed = false;
                             }
                             boolean autostart = mPlayer.getConfig().getAutostart();
@@ -1013,7 +1011,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                         }
                         break;
                     case AudioManager.AUDIOFOCUS_LOSS:
-                        synchronized(focusLock) {
+                        synchronized (focusLock) {
                             wasInterrupted = true;
                             playbackDelayed = false;
                         }
@@ -1021,7 +1019,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                         hasAudioFocus = false;
                         break;
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                        synchronized(focusLock) {
+                        synchronized (focusLock) {
                             wasInterrupted = true;
                             playbackDelayed = false;
                         }
@@ -1102,7 +1100,7 @@ public class RNJWPlayerView extends RelativeLayout implements
 
         WritableMap event = Arguments.createMap();
         event.putString("message", "onPlaylistItem");
-        event.putInt("index",playlistItemEvent.getIndex());
+        event.putInt("index", playlistItemEvent.getIndex());
         event.putString("playlistItem", playlistItemEvent.getPlaylistItem().toJson().toString());
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topPlaylistItem", event);
     }
@@ -1198,7 +1196,7 @@ public class RNJWPlayerView extends RelativeLayout implements
         Exception ex = errorEvent.getException();
         if (ex != null) {
             event.putString("error", ex.toString());
-            event.putString("description",  errorEvent.getMessage());
+            event.putString("description", errorEvent.getMessage());
         }
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topPlayerError", event);
 
@@ -1284,6 +1282,8 @@ public class RNJWPlayerView extends RelativeLayout implements
         event.putString("message", "onAdPlay");
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topAdPlay", event);
     }
+
+
 
     /*
     @Override
@@ -1440,7 +1440,7 @@ public class RNJWPlayerView extends RelativeLayout implements
             Cast.CastOptions.Builder apiOptionsBuilder = new Cast.CastOptions.Builder(connectedDevice(), mCastClientListener);
 
             mApiClient = new GoogleApiClient.Builder(getContext())
-                    .addApi( Cast.API, apiOptionsBuilder.build() )
+                    .addApi(Cast.API, apiOptionsBuilder.build())
                     .addConnectionCallbacks(mConnectionCallbacksImpl)
                     .addOnConnectionFailedListener(mOnConnectionFailedListenerImpl)
                     .build();

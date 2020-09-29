@@ -22,6 +22,7 @@ declare module "react-native-jw-media-player" {
     displayTitle?: boolean;
     repeat?: boolean;
     backgroundAudioEnabled: boolean;
+    captionTracks?: { label: string, file: string, isDefault?: boolean }
   }
   interface PropsType {
     mediaId?: number;

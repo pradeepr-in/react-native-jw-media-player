@@ -301,6 +301,44 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void setVideoQualityLevel(final int reactTag, final int qualityLevel) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute(NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            playerView.mPlayer.setCurrentQuality(qualityLevel);
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
+  public void getCurrentVideoQualityLevel(final int reactTag, final Promise promise) {
+    try {
+      UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        public void execute(NativeViewHierarchyManager nvhm) {
+          RNJWPlayerView playerView = (RNJWPlayerView) nvhm.resolveView(reactTag);
+
+          if (playerView != null && playerView.mPlayer != null) {
+            promise.resolve(playerView.mPlayer.getCurrentQuality());
+          } else {
+            promise.reject("RNJW Error", "Player is null");
+          }
+        }
+      });
+    } catch (IllegalViewOperationException e) {
+      throw e;
+    }
+  }
+
+  @ReactMethod
   public void showCastButton(final int reactTag, final float x, final float y, final float width, final float height, final boolean autoHide) {
     try {
       UIManagerModule uiManager = mReactContext.getNativeModule(UIManagerModule.class);
