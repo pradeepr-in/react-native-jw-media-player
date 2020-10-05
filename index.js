@@ -118,6 +118,7 @@ export default class JWPlayer extends Component {
     play: PropTypes.func,
     getCurrentVideoQualityLevel: PropTypes.func,
     setVideoQualityLevel: PropTypes.func,
+    getVideoQualityLevels: PropTypes.func,
     pause: PropTypes.func,
     toggleSpeed: PropTypes.func,
     setSpeed: PropTypes.func,
@@ -155,6 +156,7 @@ export default class JWPlayer extends Component {
     onControlBarVisible: PropTypes.func,
     onControlBarVisible: PropTypes.func,
     onPlaylistComplete: PropTypes.func,
+    onLevels: PropTypes.func,
   };
 
   pause() {
@@ -165,8 +167,24 @@ export default class JWPlayer extends Component {
     if (RNJWPlayerManager) { RNJWPlayerManager.play(this.getRNJWPlayerBridgeHandle()); }
   }
 
-  getCurrentVideoQualityLevel() {
-    if (RNJWPlayerManager) { RNJWPlayerManager.getCurrentVideoQualityLevel(this.getRNJWPlayerBridgeHandle()); }
+  async getCurrentVideoQualityLevel() {
+    try {
+      if (RNJWPlayerManager) { return (await RNJWPlayerManager.getCurrentVideoQualityLevel(this.getRNJWPlayerBridgeHandle())); }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  async getVideoQualityLevels() {
+    try {
+      if (RNJWPlayerManager) {
+        return (await RNJWPlayerManager.getVideoQualityLevels(this.getRNJWPlayerBridgeHandle()));
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   }
 
   setVideoQualityLevel(qualityLevel) {

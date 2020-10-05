@@ -180,6 +180,34 @@ RCT_EXPORT_METHOD(setSpeed: (nonnull NSNumber *)reactTag: (double)speed) {
     }];
 }
 
+RCT_EXPORT_METHOD(setVideoQualityLevel: (nonnull NSNumber *)reactTag: (double)qualityLevel) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+        } else {
+            view.player.currentQuality = qualityLevel;
+        }
+    }];
+}
+
+RCT_REMAP_METHOD(getCurrentVideoQualityLevel,
+                 tag:(nonnull NSNumber *)reactTag
+                 presolver:(RCTPromiseResolveBlock)resolve
+                 prejector:(RCTPromiseRejectBlock)reject) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
+        RNJWPlayerNativeView *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNJWPlayerNativeView class]] || view.player == nil) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNJWPlayerNativeView, got: %@", view);
+            NSError *error = [[NSError alloc] init];
+            reject(@"no_player", @"There is no player", error);
+        } else {
+            //            view.player.currentQuality = qualityLevel;
+            resolve([NSNumber numberWithInt:[view.player currentQuality]]);
+        }
+    }];
+}
+
 RCT_EXPORT_METHOD(setPlaylistIndex: (nonnull NSNumber *)reactTag: (nonnull NSNumber *)index) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNJWPlayerNativeView *> *viewRegistry) {
         RNJWPlayerNativeView *view = viewRegistry[reactTag];

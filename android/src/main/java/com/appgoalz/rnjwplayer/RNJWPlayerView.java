@@ -36,6 +36,7 @@ import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
@@ -67,6 +68,8 @@ import com.longtailvideo.jwplayer.events.ErrorEvent;
 import com.longtailvideo.jwplayer.events.FirstFrameEvent;
 import com.longtailvideo.jwplayer.events.FullscreenEvent;
 import com.longtailvideo.jwplayer.events.IdleEvent;
+import com.longtailvideo.jwplayer.events.LevelsChangedEvent;
+import com.longtailvideo.jwplayer.events.LevelsEvent;
 import com.longtailvideo.jwplayer.events.PauseEvent;
 import com.longtailvideo.jwplayer.events.PlayEvent;
 import com.longtailvideo.jwplayer.events.PlaylistCompleteEvent;
@@ -80,6 +83,7 @@ import com.longtailvideo.jwplayer.events.TimeEvent;
 import com.longtailvideo.jwplayer.events.listeners.AdvertisingEvents;
 import com.longtailvideo.jwplayer.events.listeners.VideoPlayerEvents;
 import com.longtailvideo.jwplayer.fullscreen.FullscreenHandler;
+import com.longtailvideo.jwplayer.media.adaptive.QualityLevel;
 import com.longtailvideo.jwplayer.media.ads.AdBreak;
 import com.longtailvideo.jwplayer.media.ads.AdSource;
 import com.longtailvideo.jwplayer.media.ads.ImaVMAPAdvertising;
@@ -114,6 +118,8 @@ public class RNJWPlayerView extends RelativeLayout implements
         VideoPlayerEvents.OnFirstFrameListener,
         VideoPlayerEvents.OnSeekListener,
         VideoPlayerEvents.OnSeekedListener,
+        VideoPlayerEvents.OnLevelsChangedListener,
+        VideoPlayerEvents.OnLevelsListener,
         AdvertisingEvents.OnBeforePlayListener,
         AdvertisingEvents.OnBeforeCompleteListener,
         AdvertisingEvents.OnAdPauseListener,
@@ -373,7 +379,8 @@ public class RNJWPlayerView extends RelativeLayout implements
             mPlayer.removeOnFullscreenListener(this);
             mPlayer.removeOnSeekListener(this);
             mPlayer.removeOnSeekedListener(this);
-
+            mPlayer.removeOnLevelsChangedListener(this);
+            mPlayer.removeOnLevelsListener(this);
             // Ad Events
             mPlayer.removeOnBeforePlayListener(this);
             mPlayer.removeOnBeforeCompleteListener(this);
@@ -422,7 +429,8 @@ public class RNJWPlayerView extends RelativeLayout implements
             mPlayer.addOnFullscreenListener(this);
             mPlayer.addOnSeekListener(this);
             mPlayer.addOnSeekedListener(this);
-
+            mPlayer.addOnLevelsChangedListener(this);
+            mPlayer.addOnLevelsListener(this);
             // Ad events
             mPlayer.addOnBeforePlayListener(this);
             mPlayer.addOnBeforeCompleteListener(this);
@@ -1266,6 +1274,28 @@ public class RNJWPlayerView extends RelativeLayout implements
         getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topSeeked", event);
     }
 
+    @Override
+    public void onLevels(LevelsEvent levelsEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onLevels");
+        WritableArray levelsArray = Arguments.createArray();
+        for (QualityLevel ql : levelsEvent.getLevels()) {
+            WritableMap map = Arguments.createMap();
+            map.putString("label", ql.getLabel());
+            map.putInt("index", ql.getTrackIndex());
+            levelsArray.pushMap(map);
+        }
+        event.putArray("qualityLevels", levelsArray);
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topOnLevels", event);
+    }
+
+    @Override
+    public void onLevelsChanged(LevelsChangedEvent levelsChangedEvent) {
+        WritableMap event = Arguments.createMap();
+        event.putString("message", "onLevelsChanged");
+        event.putInt("currentLevel", levelsChangedEvent.getCurrentQuality());
+        getReactContext().getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "topLevelsChanged", event);
+    }
 
     /* Ad events */
 

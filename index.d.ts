@@ -6,6 +6,10 @@ declare module "react-native-jw-media-player" {
     name?: string;
     identifier?: string;
   }
+  interface QualityLevel {
+    label: string;
+    index: Number;
+  }
   interface PlaylistItem {
     mediaId?: number;
     startTime?: number;
@@ -65,6 +69,7 @@ declare module "react-native-jw-media-player" {
     onFullScreenExit: () => void;
     onPlaylistComplete: () => void;
     onPlaylistItem: (playlistItem: any) => void;
+    onLevels: () => QualityLevel[];
   }
 
   export default class JWPlayer extends React.Component<PropsType> {
@@ -74,6 +79,9 @@ declare module "react-native-jw-media-player" {
     stop(): void;
     playerState(): Promise<number | null>;
     position(): Promise<number>;
+    getCurrentVideoQualityLevel(): Promise<number> | null;
+    setVideoQualityLevel(): void;
+    getVideoQualityLevels(): Promise<QualityLevel[]> | null;
     toggleSpeed(): void;
     setPlaylistIndex(index: number): void;
     showAirPlayButton(x: number, y: number, width: number, height: number, autoHide: boolean): void;
