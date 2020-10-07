@@ -521,6 +521,11 @@ public class RNJWPlayerView extends RelativeLayout implements
                         mPlayerContainer.post(new Runnable() {
                             @Override
                             public void run() {
+                                if (mPlayer == null) {
+                                    Log.e("PLAYER NULL", "LLL");
+                                    mFullscreenPlayer = null;
+                                    return;
+                                }
                                 mPlayerContainer.addView(mPlayer, new ViewGroup.LayoutParams(
                                         ViewGroup.LayoutParams.MATCH_PARENT,
                                         ViewGroup.LayoutParams.MATCH_PARENT

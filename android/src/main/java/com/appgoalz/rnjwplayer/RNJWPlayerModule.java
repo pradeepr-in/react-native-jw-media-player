@@ -350,16 +350,17 @@ public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
                         WritableArray levelsArray = Arguments.createArray();
                         if (playerView.mPlayer.getQualityLevels() != null) {
+                            for (QualityLevel ql : playerView.mPlayer.getQualityLevels()) {
+                                WritableMap map = Arguments.createMap();
+                                map.putString("label", ql.getLabel());
+                                map.putInt("index", ql.getTrackIndex());
+                                levelsArray.pushMap(map);
+                            }
                             promise.resolve(levelsArray);
-                            return;
+                        } else {
+                            promise.reject("RNJW Error", "Cant get quality levels");
                         }
-                        for (QualityLevel ql : playerView.mPlayer.getQualityLevels()) {
-                            WritableMap map = Arguments.createMap();
-                            map.putString("label", ql.getLabel());
-                            map.putInt("index", ql.getTrackIndex());
-                            levelsArray.pushMap(map);
-                        }
-                        promise.resolve(levelsArray);
+
                     } else {
                         promise.reject("RNJW Error", "Player is null");
                     }
