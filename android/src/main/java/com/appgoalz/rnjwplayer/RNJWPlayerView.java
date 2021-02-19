@@ -14,6 +14,7 @@ import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.util.TypedValue;
@@ -24,6 +25,8 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.mediarouter.app.MediaRouteButton;
 import androidx.mediarouter.app.MediaRouteChooserDialog;
 import androidx.mediarouter.media.MediaRouter;
@@ -36,6 +39,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.google.android.gms.cast.Cast;
 import com.google.android.gms.cast.CastDevice;
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
@@ -45,6 +49,7 @@ import com.google.android.gms.cast.framework.SessionManager;
 import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
 import com.longtailvideo.jwplayer.configuration.SkinConfig;
 import com.longtailvideo.jwplayer.events.AdPauseEvent;
@@ -79,6 +84,8 @@ import com.longtailvideo.jwplayer.media.ads.AdBreak;
 import com.longtailvideo.jwplayer.media.ads.AdSource;
 import com.longtailvideo.jwplayer.media.ads.ImaVMAPAdvertising;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
+import com.longtailvideo.jwplayer.media.captions.Caption;
+import com.longtailvideo.jwplayer.media.captions.CaptionType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -150,6 +157,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     Boolean autostart = true;
     Boolean controls = true;
     Boolean repeat = false;
+    Boolean mute = false;
     Boolean displayTitle = false;
     Boolean displayDesc = false;
     Boolean nextUpDisplay = false;
@@ -167,10 +175,16 @@ public class RNJWPlayerView extends RelativeLayout implements
     private CastContext mCastContext;
     private CastSession mCastSession;
     private SessionManager mSessionManager;
-    private final SessionManagerListener mSessionManagerListener =
-            new SessionManagerListenerImpl();
     private MediaRouteButton mMediaRouteButton;
     private boolean mAutoHide;
+    private final SessionManagerListener mSessionManagerListener =
+            new SessionManagerListenerImpl();
+    private final GoogleApiClient.ConnectionCallbacks mConnectionCallbacksImpl =
+            new ConnectionCallbacksImpl();
+    private final GoogleApiClient.OnConnectionFailedListener mOnConnectionFailedListenerImpl =
+            new OnConnectionFailedListenerImpl();
+    private Cast.Listener mCastClientListener;
+    private GoogleApiClient mApiClient;
 
     private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_OLD = "com.google.market";
     private static final String GOOGLE_PLAY_STORE_PACKAGE_NAME_NEW = "com.android.vending";
@@ -607,6 +621,23 @@ public class RNJWPlayerView extends RelativeLayout implements
             startTime = playlistItem.getDouble("startTime");
         }
 
+        ArrayList<Caption> tracks = new ArrayList<>();
+
+        if (playlistItem.hasKey("tracks")) {
+            ReadableArray track = playlistItem.getArray("tracks");
+            if (track != null) {
+                for (int i = 0; i < track.size(); i++) {
+                    ReadableMap trackProp = track.getMap(i);
+                    if (trackProp != null && trackProp.hasKey("file")) {
+                        String file = trackProp.getString("file");
+                        String label = trackProp.getString("label");
+                        Caption caption = new Caption(file, CaptionType.CAPTIONS, label, false);
+                        tracks.add(caption);
+                    }
+                }
+            }
+        }
+
         ArrayList<AdBreak> adSchedule = new ArrayList<>();
 
         if (playlistItem.hasKey("adSchedule")) {
@@ -629,6 +660,7 @@ public class RNJWPlayerView extends RelativeLayout implements
                 .image(image)
                 .mediaId(mediaId)
                 .adSchedule(adSchedule)
+                .tracks(tracks)
                 .build();
 
         if (startTime != null) {
@@ -831,7 +863,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     }
 
     CastDevice connectedDevice() {
-        if (mCastContext != null) {
+        if (mCastContext != null && mCastContext.getSessionManager() != null && mCastContext.getSessionManager().getCurrentCastSession() != null) {
             return mCastContext.getSessionManager().getCurrentCastSession().getCastDevice();
         }
 
@@ -1329,6 +1361,25 @@ public class RNJWPlayerView extends RelativeLayout implements
     }
     */
 
+    private class ConnectionCallbacksImpl implements GoogleApiClient.ConnectionCallbacks {
+        @Override
+        public void onConnected(@Nullable Bundle bundle) {
+
+        }
+
+        @Override
+        public void onConnectionSuspended(int i) {
+
+        }
+    }
+
+    private class OnConnectionFailedListenerImpl implements GoogleApiClient.OnConnectionFailedListener {
+        @Override
+        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+        }
+    }
+
     private class SessionManagerListenerImpl implements SessionManagerListener {
         @Override
         public void onSessionStarting(Session session) {
@@ -1380,14 +1431,39 @@ public class RNJWPlayerView extends RelativeLayout implements
 
     @Override
     public void onHostResume() {
-        mCastSession = mSessionManager.getCurrentCastSession();
-        mSessionManager.addSessionManagerListener(mSessionManagerListener);
+        if (mSessionManager != null) {
+            mSessionManager.addSessionManagerListener(mSessionManagerListener);
+            
+            if (mCastSession == null) {
+            	mCastSession = mSessionManager.getCurrentCastSession();
+        	}
+        }
+
+        if (connectedDevice() != null) {
+            mCastClientListener = new Cast.Listener() {
+
+            };
+
+            Cast.CastOptions.Builder apiOptionsBuilder = new Cast.CastOptions.Builder(connectedDevice(), mCastClientListener);
+
+            mApiClient = new GoogleApiClient.Builder(getContext())
+                    .addApi( Cast.API, apiOptionsBuilder.build() )
+                    .addConnectionCallbacks(mConnectionCallbacksImpl)
+                    .addOnConnectionFailedListener(mOnConnectionFailedListenerImpl)
+                    .build();
+        }
     }
 
     @Override
     public void onHostPause() {
-        mSessionManager.removeSessionManagerListener(mSessionManagerListener);
+        if (mSessionManager != null) {
+            mSessionManager.removeSessionManagerListener(mSessionManagerListener);
+        }
+
         mCastSession = null;
+        mCastClientListener = null;
+        mApiClient = null;
+        mCastContext = null;
     }
 
     @Override

@@ -347,6 +347,18 @@
     return self.player.config.repeat;
 }
 
+-(void)setMute:(BOOL)mute
+{
+    if(self.player.volume > 0) {
+        self.player.volume = 0;
+    }
+}
+
+-(BOOL)mute
+{
+    return self.player.volume == 0;
+}
+
 -(void)setDisplayDesc:(BOOL)displayDesc
 {
     if(displayDesc != self.player.config.displayDescription) {
@@ -406,7 +418,7 @@
     
     NSString *newFile = [item objectForKey:@"file"];
     
-    NSURL* url = [NSURL URLWithString:newFile];
+    NSURL* url = [NSURL URLWithString: newFile];
     if (url && url.scheme && url.host) {
         playListItem.file = newFile;
     } else {
@@ -437,6 +449,23 @@
     id startTime = item[@"startTime"];
     if ((startTime != nil) && (startTime != (id)[NSNull null])) {
         playListItem.startTime = [startTime floatValue];
+    }
+
+    NSMutableArray <JWTrack *> *tracksArray = [[NSMutableArray alloc] init];
+    id tracksItem = item[@"tracks"];
+    if(tracksItem != nil) {
+        NSArray* tracksItemArray = (NSArray*)tracksItem;
+        if(tracksItemArray.count > 0) {
+            for (id item in tracksItemArray) {
+                NSString *file = [item objectForKey:@"file"];
+                NSString *label = [item objectForKey:@"label"];
+                JWTrack *trackItem = [JWTrack trackWithFile:file label:label];
+                [tracksArray addObject:trackItem];
+            }
+        }
+    }
+    if (tracksArray.count > 0) {
+        playListItem.tracks = tracksArray;
     }
     
     NSMutableArray <JWAdBreak *> *adsArray = [[NSMutableArray alloc] init];
