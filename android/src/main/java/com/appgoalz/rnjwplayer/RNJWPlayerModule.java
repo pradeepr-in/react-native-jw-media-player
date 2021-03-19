@@ -17,8 +17,12 @@ import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.UIBlock;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.google.android.gms.cast.CastDevice;
+import com.google.gson.Gson;
 import com.longtailvideo.jwplayer.core.PlayerState;
 import com.longtailvideo.jwplayer.media.adaptive.QualityLevel;
+import com.longtailvideo.jwplayer.media.audio.AudioTrack;
+
+import java.util.List;
 
 public class RNJWPlayerModule extends ReactContextBaseJavaModule {
 
