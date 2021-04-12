@@ -457,22 +457,24 @@
         playListItem.adSchedule = adsArray;
     }
 
-    NSMutableArray <JWTrack *> *captionsArray = [[NSMutableArray alloc] init];
+   NSMutableArray <JWTrack *> *captionsArray = [[NSMutableArray alloc] init];
     id captionTracks = item[@"captionTracks"];
     if(captionTracks!=nil){
-        NSArray* cts = (NSArray*)captionTracks;
+        NSArray* cts = (NSArray*)captionTracks ;
         if(cts.count>0){
             for(id item in cts){
                 NSString *label = [item objectForKey:@"label"];
                 NSString *file = [item objectForKey:@"file"];
-                JWTrack *ct = [JWTrack trackWithFile:file label:label];
-                [captionTracks addObject:ct];
+                bool isDefault = [item objectForKey:@"isDefault"];
+                printf("CAPTION LABEL %s",[label UTF8String]);
+                JWTrack *ct = [JWTrack trackWithFile:file label:label isDefault:isDefault];
+                [captionsArray addObject:ct];
             }
         }
     }
 
     if(captionsArray.count>0){
-        playListItem.tracks = captionTracks;
+        playListItem.tracks = captionsArray;
     }
 
     return playListItem;
