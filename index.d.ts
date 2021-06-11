@@ -70,6 +70,7 @@ declare module "react-native-jw-media-player" {
     onPlaylistComplete: () => void;
     onPlaylistItem: (playlistItem: any) => void;
     onLevels: () => QualityLevel[];
+    onLevelsChanged: () => Number
   }
 
   export default class JWPlayer extends React.Component<PropsType> {

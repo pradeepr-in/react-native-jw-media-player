@@ -97,8 +97,7 @@ export default class App extends Component {
             <Text
               style={styles.warningText}
             >
-              {`If you see this text your configuration or setup is wrong.\n\nDid you forget to add your JW key to your ${
-                Platform.OS === 'ios' ? 'plist' : 'manifest'
+              {`If you see this text your configuration or setup is wrong.\n\nDid you forget to add your JW key to your ${Platform.OS === 'ios' ? 'plist' : 'manifest'
               }?\nDid you add a playlistItem with at least a file paramter?`}
             </Text>
             <JWPlayer

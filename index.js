@@ -157,6 +157,7 @@ export default class JWPlayer extends Component {
     onControlBarVisible: PropTypes.func,
     onPlaylistComplete: PropTypes.func,
     onLevels: PropTypes.func,
+    onLevelsChanged: PropTypes.func,
   };
 
   pause() {

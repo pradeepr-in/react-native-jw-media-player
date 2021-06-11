@@ -63,6 +63,7 @@
     config.repeat = NO;
     config.displayDescription = YES;
     config.displayTitle = YES;
+    config.playbackRateControls=YES;
     
     return config;
 }

@@ -758,9 +758,11 @@ public class RNJWPlayerView extends RelativeLayout implements
         }
 
         imaVMAPAdvertising.setClient(client);
+        float[] playbackRates = new float[]{ 0.5f, 1f, 1.25f, 1.5f, 2.0f};
 
         PlayerConfig playerConfig = new PlayerConfig.Builder()
                 .skinConfig(skinConfig)
+                .playbackRates(PlaybackRateConfig.Factory.createPlaybackRateConfig(playbackRates))
                 .repeat(false)
                 .controls(true)
                 .autostart(autostart)
