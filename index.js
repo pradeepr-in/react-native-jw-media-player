@@ -110,6 +110,7 @@ export default class JWPlayer extends Component {
                 adClient: PropTypes.string,
                 startTime: PropTypes.number,
                 backgroundAudioEnabled: PropTypes.bool,
+                playFirst: PropTypes.bool,
             })
         ),
         onPlayerReady: PropTypes.func,

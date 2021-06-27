@@ -495,6 +495,11 @@
         for (id item in playlist) {
             JWPlaylistItem *playListItem = [self getPlaylistItem:item];
             [playlistArray addObject:playListItem];
+            //  if ([item objectForKey:@"playFirst"] != nil) {
+            //      if([item objectForKey:@"playFirst"]==TRUE){
+
+            //      }
+            //  }
         }
         
         JWConfig *config = [self setupConfig];

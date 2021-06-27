@@ -51,6 +51,7 @@ import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.longtailvideo.jwplayer.configuration.PlaybackRateConfig;
 import com.longtailvideo.jwplayer.configuration.PlayerConfig;
 import com.longtailvideo.jwplayer.configuration.SkinConfig;
 import com.longtailvideo.jwplayer.events.AdPauseEvent;
@@ -157,6 +158,7 @@ public class RNJWPlayerView extends RelativeLayout implements
     String customStyle;
     String adVmap = "";
     Double startTime;
+    Integer initialPlayListIndex = 0;
 
     Boolean autostart = true;
     Boolean controls = true;
@@ -692,6 +694,11 @@ public class RNJWPlayerView extends RelativeLayout implements
                     if (playlistItem != null) {
                         PlaylistItem newPlayListItem = this.getPlaylistItem((playlistItem));
                         mPlayList.add(newPlayListItem);
+                        if (playlistItem.hasKey("playFirst")) {
+                            if (playlistItem.getBoolean("playFirst")) {
+                                initialPlayListIndex = j;
+                            }
+                        }
                     }
 
                     j++;
@@ -767,6 +774,8 @@ public class RNJWPlayerView extends RelativeLayout implements
                 .controls(true)
                 .autostart(autostart)
                 .displayTitle(true)
+                .playlistIndex(initialPlayListIndex)
+                .playlist(mPlayList)
                 .displayDescription(true)
                 .nextUpDisplay(true)
                 .nextUpOffset(nextUpOffset)
@@ -803,7 +812,7 @@ public class RNJWPlayerView extends RelativeLayout implements
             mPlayer.getConfig().setAutostart(prop.getBoolean("autostart"));
         }
 
-        mPlayer.load(mPlayList);
+        // mPlayer.load(mPlayList);
 
         if (autostart) {
             mPlayer.play();
