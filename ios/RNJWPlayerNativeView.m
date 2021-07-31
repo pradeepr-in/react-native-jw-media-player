@@ -483,6 +483,7 @@
 
 -(void)setPlaylist:(NSArray *)playlist
 {
+    NSUInteger intialPlaylistIndex=0;
     if (playlist != nil && playlist.count > 0) {
         if ([playlist[0] objectForKey:@"backgroundAudioEnabled"] != nil) {
             bool backgroundAudioEnabled = [playlist[0] objectForKey:@"backgroundAudioEnabled"];
@@ -495,11 +496,11 @@
         for (id item in playlist) {
             JWPlaylistItem *playListItem = [self getPlaylistItem:item];
             [playlistArray addObject:playListItem];
-            //  if ([item objectForKey:@"playFirst"] != nil) {
-            //      if([item objectForKey:@"playFirst"]==TRUE){
-
-            //      }
-            //  }
+            if ([item objectForKey:@"playFirst"] != nil) {
+                if([ [item objectForKey:@"playFirst"] boolValue]){
+                    intialPlaylistIndex = [playlist indexOfObject:item];
+                }
+            }
         }
         
         JWConfig *config = [self setupConfig];
@@ -558,7 +559,7 @@
             [self reset];
             
             config.playlist = playlistArray;
-            
+            config.playlistIndex = intialPlaylistIndex;
             _proxy = [RNJWPlayerDelegateProxy new];
             _proxy.delegate = self;
             
