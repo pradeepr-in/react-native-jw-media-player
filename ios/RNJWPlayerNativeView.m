@@ -64,7 +64,7 @@
     config.displayDescription = YES;
     config.displayTitle = YES;
     config.playbackRateControls=YES;
-    
+    config.nextUpDisplay=NO;
     return config;
 }
 
